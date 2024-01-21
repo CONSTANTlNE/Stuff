@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* Define the responsive grid container */
+      .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-gap: 10px;
+      }
+
+      /* Define the grid items */
+      .item {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+      }
+
+      /* Dark Theme */
+      /* CSS: Styles for the light theme */
+      body {
+        padding: 25px;
+        background-color: white;
+        color: black;
+        font-size: 25px;
+      }
+
+      /* CSS: Styles for the dark theme */
+      .dark-mode {
+        background-color: black;
+        color: white;
+      }
+
+      /* CSS: Styles for the toggle switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      /* Rounded sliders */
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Example HTML structure using the grid -->
+    <div class="container" id="productContainer">
+      <div class="item" id="1">1</div>
+      <div class="item" id="2">2</div>
+      <div class="item" id="3">3</div>
+      <div class="item" id="4">4</div>
+      <div class="item" id="5">5</div>
+      <div class="item" id="6">6</div>
+      <div class="item" id="7">7</div>
+      <div class="item" id="8">8</div>
+      <div class="item" id="9">9</div>
+      <div class="item" id="10">10</div>
+      <div class="item" id="11">11</div>
+      <div class="item" id="12">12</div>
+      <div class="item" id="13">13</div>
+      <div class="item" id="14">14</div>
+      <div class="item" id="15">15</div>
+      <div class="item" id="16">16</div>
+      <div class="item" id="17">17</div>
+      <div class="item" id="18">18</div>
+      <div class="item" id="19">19</div>
+      <div class="item" id="20">20</div>
+      <div class="item" id="21">21</div>
+    </div>
+    <!-- HTML: Toggle switch -->
+    <label class="switch">
+      <input type="checkbox" id="theme-toggle" />
+      <span class="slider round"></span>
+    </label>
+
+    <div id="pagination"></div>
+
+    <script>
+      // JavaScript: Function to toggle dark mode
+      function toggleDarkMode() {
+        var element = document.body;
+        element.classList.toggle("dark-mode");
+      }
+
+      // JavaScript: Event listener for the toggle switch
+      document
+        .getElementById("theme-toggle")
+        .addEventListener("change", toggleDarkMode);
+    </script>
+
+    <!-- pagination -->
+    <script>
+      // Sample product data (replace this with your actual product data)
+      const itemsPerPage = 10;
+      let currentPage = 1;
+
+      function displayItems() {
+        const container = document.getElementById("productContainer");
+        const items = container.getElementsByClassName("item");
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const itemId = parseInt(item.id);
+
+          if (
+            itemId >= (currentPage - 1) * itemsPerPage + 1 &&
+            itemId <= currentPage * itemsPerPage
+          ) {
+            item.style.display = "block";
+          } else {
+            item.style.display = "none";
+          }
+        }
+      }
+
+      function renderPagination() {
+        const totalItems = document
+          .getElementById("productContainer")
+          .getElementsByClassName("item").length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const paginationElement = document.getElementById("pagination");
+        paginationElement.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+          const pageLink = document.createElement("a");
+          pageLink.href = "#";
+          pageLink.textContent = i;
+          pageLink.addEventListener("click", () => {
+            currentPage = i;
+            displayItems();
+            renderPagination();
+          });
+
+          if (i === currentPage) {
+            pageLink.classList.add("active");
+          }
+
+          paginationElement.appendChild(pageLink);
+        }
+      }
+
+      // Initial display
+      displayItems();
+      renderPagination();
+    </script>
+  </body>
+</html>

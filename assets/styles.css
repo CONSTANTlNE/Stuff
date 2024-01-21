@@ -1,0 +1,41 @@
+/* Style for vertical collapsing tabs */
+.tab-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.tab-button {
+  /* background-color: #f4f4f4; */
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  outline: none;
+}
+
+/* .tab-button:hover {
+  background-color: #ddd;
+} */
+
+.tab-indicator {
+  transition: transform 0.3s ease;
+}
+
+.tab-content {
+  display: none;
+  padding: 10px;
+  /* border-left: 2px solid #ddd; */
+}
+
+/* Show the active tab content and rotate the indicator arrow */
+.tab-content.active {
+  display: block;
+}
+
+.tab.active .tab-indicator {
+  transform: rotate(90deg);
+}

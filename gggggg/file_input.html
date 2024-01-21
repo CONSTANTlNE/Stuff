@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom File Input</title>
+    <style>
+      /* Hide the default file input */
+      input[name="lang_backgr"] {
+        display: none;
+      }
+
+      /* Style the custom file input container */
+      .custom-file-input {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #3498db;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      /* Style the file name display */
+      .file-name {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Custom file input container -->
+    <label for="fileInput" class="custom-file-input">
+      Choose File
+      <input
+        type="file"
+        name="lang_backgr"
+        id="fileInput"
+        onchange="displayFileName()"
+      />
+    </label>
+
+    <!-- Display selected file name -->
+    <div class="file-name" id="fileName"></div>
+
+    <script>
+      function displayFileName() {
+        // Get the selected file input
+        var fileInput = document.getElementById("fileInput");
+
+        // Get the file name
+        var fileName = fileInput.files[0].name;
+
+        // Display the file name
+        document.getElementById("fileName").innerText =
+          "Selected File: " + fileName;
+      }
+    </script>
+  </body>
+</html>

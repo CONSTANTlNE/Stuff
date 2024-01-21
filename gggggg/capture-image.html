@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input
+      type="file"
+      accept="image/*"
+      id="fileInput"
+      capture="environment"
+      style="display: none"
+    />
+
+    <button id="uploadButton">Choose Image or Take Photo</button>
+
+    <script>
+      document
+        .getElementById("uploadButton")
+        .addEventListener("click", function () {
+          if (
+            window.confirm("Do you want to upload an image or take a photo?")
+          ) {
+            // If 'OK' is clicked, trigger file input click to choose an image
+            document.getElementById("fileInput").click();
+          } else {
+            // If 'Cancel' is clicked, open the camera
+            document.getElementById("fileInput").removeAttribute("capture");
+            document.getElementById("fileInput").click();
+          }
+        });
+    </script>
+  </body>
+</html>

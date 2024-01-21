@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/prism.css" />
+
+    <title>Spatie</title>
+
+    <style>
+      li {
+        list-style: none;
+        background-color: black;
+      }
+
+      span {
+        color: red;
+        font-weight: bold;
+      }
+      @media (max-width: 400px) {
+        nav {
+          flex-wrap: wrap;
+          align-items: center;
+        }
+      }
+
+      strong {
+        color: brown;
+      }
+    </style>
+  </head>
+  <body>
+    <nav style="display: flex; justify-content: space-evenly; font-size: 20px">
+      <a href="laravel.html">General</a>
+      <a href="relationships.html">Relationships</a>
+      <a href="migrations.html">Migrations/Model</a>
+      <a href="forms.html">Forms</a>
+      <a href="fortify.html">fortify</a>
+      <a href="resurces.html">resurces</a>
+      <a href="files.html">file uploads </a>
+      <a href="spatie.html">Spatie</a>
+      <a href="tips.html">Tips And Tricks</a>
+    </nav>
+
+    <main>
+      <div class="tab-container">
+        <div class="tab">
+          <button class="tab-button" onclick="toggleTab('tab100')">
+            Roles And Permissions Package
+            <span class="tab-indicator">&#9658;</span>
+          </button>
+          <div class="tab-content" id="tab100">
+            <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+            <div class="tab-container">
+              <div class="tab">
+                <button class="tab-button" onclick="toggleTab('tab1')">
+                  Best Practices
+                  <span class="tab-indicator">&#9658;</span>
+                </button>
+                <div class="tab-content" id="tab1"></div>
+              </div>
+            </div>
+
+            <div class="tab-container">
+              <div class="tab">
+                <button class="tab-button" onclick="toggleTab('tab4')">
+                  Installation and Configuration
+                  <span class="tab-indicator">&#9658;</span>
+                </button>
+                <div class="tab-content" id="tab4">
+                  <p>
+                    By Default spatie creates models
+                    <strong>Role.php</strong> and
+                    <strong>Permission.php</strong> they are located in : <br />
+                    vendor/spatie/laravel-permission/src/Models
+                  </p>
+                  <p>The User model requires this trait</p>
+
+                  <pre><code class="language-PHP">
+                    In User Model
+                     use HasRoles;
+                  </code></pre>
+
+                  <p>In kernel.php</p>
+                  <pre><code class="language-PHP">
+
+
+    protected $middlewareAliases = [
+// ...
+'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+];
+
+      </code></pre>
+
+                  <p>Create Roles in Seeder</p>
+
+                  <pre class="language-PHP"><code>
+========== Role Seeder : ==========
+
+public function run(): void
+    {
+        Role::create(['name'=>'admin']);
+        Role::create(['name'=>'writer']);
+        Role::create(['name'=>'user']);
+    }
+
+========== Create user as Admin - Admin Seeder: ========== 
+
+
+public function run(): void
+    {
+        $user=User::create([
+            'name' => 'Constantine',
+            'email' => 'gmta.constantine@gmail.com',
+            'email_verified_at' => now(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+        ]);
+        $user->assignRole('admin','writer');
+    }
+      </code></pre>
+
+                  <p>Protect Route with Role Middleware</p>
+
+                  <pre><code class="language-PHP">
+Route::get('/admin', function () {
+    return view('admin.index');
+})->middleware(['auth', 'role:admin'])->name('admin.index');
+</code></pre>
+
+                  <p>Roles In View</p>
+
+                  <pre><code class="language-PHP">
+The Link will be shown only for users with Role Admin
+
+@role('admin')
+&lt;x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.index')">
+    {{ __('Admin') }}
+&lt;/x-nav-link>
+@endrole
+
+</code></pre>
+
+                  <p>Route Middleware</p>
+
+                  <pre><code class="language-PHP">
+Route::middleware(['auth', 'role:admin']) ->name('admin.')->prefix('admin')->group(function () {
+    Route::resource('/admin',AdminController::class);
+    Route::resource('/roles',RoleController::class);
+    Route::resource('/permissions',PermissionController::class);
+});
+</code></pre>
+                  <br />
+                  <hr />
+                  <br />
+
+                  <p>
+                    Eloquent Calls <br /><br />
+                    Since Role and Permission models are extended from Eloquent
+                    models, basic Eloquent calls can be used as well:
+                  </p>
+
+                  <pre><code class="language-PHP">$all_users_with_all_their_roles = User::with('roles')->get();
+$all_users_with_all_their_direct_permissions = User::with('permissions')->get();
+$all_roles_in_database = Role::all()->pluck('name');
+$users_without_any_roles = User::doesntHave('roles')->get();
+$all_roles_except_a_and_b = Role::whereNotIn('name', ['role A', 'role B'])->get();</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <div class="tab-container">
+              <div class="tab">
+                <button class="tab-button" onclick="toggleTab('tab2')">
+                  Assign/Remove roles from user
+
+                  <span class="tab-indicator">&#9658;</span>
+                </button>
+                <div class="tab-content" id="tab2">
+                  <p>A role can be assigned to any user:</p>
+
+                  <pre><code class="language-PHP">
+$user->assignRole('writer');
+
+// You can also assign multiple roles at once
+$user->assignRole('writer', 'admin');
+// or as an array
+$user->assignRole(['writer', 'admin']);
+</code></pre>
+
+                  <br />
+                  <hr />
+                  <p>A role can be assigned to any user:</p>
+
+                  <pre><code class="language-PHP">
+$user->removeRole('writer');
+</code></pre>
+                  <br />
+                  <hr />
+                  <p>Roles can also be synced:</p>
+
+                  <pre><code class="language-PHP">
+// All current roles will be removed from the user and replaced by the array given
+$user->syncRoles(['writer', 'admin']);
+</code></pre>
+                </div>
+              </div>
+            </div>
+            <!-- ============================================================ -->
+            <div class="tab-container">
+              <div class="tab">
+                <button class="tab-button" onclick="toggleTab('tab6')">
+                  Assign/Remove permissions from role
+
+                  <span class="tab-indicator">&#9658;</span>
+                </button>
+                <div class="tab-content" id="tab6">
+                  <p>Create A Permission</p>
+
+                  <pre><code class="language-PHP">
+in Controller 
+
+$role = Role::create(['name' => 'writer']);
+$permission = Permission::create(['name' => 'edit articles']);
+</code></pre>
+
+                  <p>Assign A Permission To A Role</p>
+
+                  <pre><code class="language-PHP">
+in Controller 
+
+$role->givePermissionTo($permission);
+$permission->assignRole($role);
+
+Or revoke & add new permissions in one go:
+
+$role->syncPermissions(['edit articles', 'delete articles']);
+
+</code></pre>
+
+                  <p>A permission can be revoked from a role:</p>
+
+                  <pre><code class="language-PHP">
+  $role->revokePermissionTo('edit articles');
+</code></pre>
+
+                  <p>You can determine if a role has a certain permission:</p>
+                  <pre><code class="language-PHP">
+$role->hasPermissionTo('edit articles');
+</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============================================================ -->
+
+            <div class="tab-container">
+              <div class="tab">
+                <button class="tab-button" onclick="toggleTab('tab3')">
+                  Blade directives (permission usage examples)
+                  <span class="tab-indicator">&#9658;</span>
+                </button>
+                <div class="tab-content" id="tab3">
+                  <p>
+                    The <strong> @can</strong> directive in Laravel Blade
+                    templates is used for authorization checks. It checks if the
+                    currently authenticated user has permission to perform a
+                    specific action or access a particular resource. In your
+                    example:
+                  </p>
+                  <br />
+
+                  <pre><code class="language-PHP">
+@can('edit articles')
+    <!-- Content that is only visible to users with 'edit articles' permission -->
+@endcan
+
+OR
+
+@if(auth()->user()->can('edit articles') && $some_other_condition)
+  //
+@endif
+            </code></pre>
+
+                  <p>
+                    <strong> @can('edit articles'):</strong> This line checks if
+                    the currently authenticated user has the permission named
+                    'edit articles'. You can think of this as a condition. If
+                    the user has this permission, the content inside the @can
+                    block will be displayed; otherwise, it will be hidden.
+                  </p>
+                  <p>
+                    The content inside the <strong>@can</strong> @can block:
+                    This is the HTML or Blade template code that you want to
+                    conditionally display or hide based on the user's
+                    permissions.
+                  </p>
+                  <p>
+                    For example, if you have a policy or gate set up in your
+                    Laravel application that grants the
+                    <strong>'edit articles' </strong> permission to certain
+                    users, only those users will see the content inside the
+                    <strong> @can</strong>
+                    block. Users without this permission will not see the
+                    content. It's a convenient way to handle authorization
+                    checks within your Blade templates and show or hide specific
+                    parts of a view based on the user's permissions.
+                  </p>
+                  <hr />
+                  <br />
+
+                  <p>Displaying Edit Buttons for Articles</p>
+                  <p>
+                    Suppose you have a list of articles, and you want to display
+                    an "Edit" button next to each article only for users who
+                    have the permission to edit articles:
+                  </p>
+                  <pre><code class="language-PHP">@foreach($articles as $article)
+    &#60;div class="article">
+        &#60;h2>{{ $article->title }}&#60;/h2>
+        &#60;p>{{ $article->content }}&#60;/p>
+        
+        @can('edit articles')
+            &#60;a href="{{ route('articles.edit', ['article' => $article]) }}">Edit&#60;/a>
+        @endcan
+    &#60;/div>
+@endforeach
+</code></pre>
+                  <p>
+                    In this example, the "Edit" link is only displayed for users
+                    who have the <strong>'edit articles'</strong> permission.
+                    Users without this permission won't see the "Edit" link.
+                  </p>
+
+                  <hr />
+                  <br />
+                  <p>Showing Premium Content</p>
+                  <p>
+                    Let's say you have a website with premium content, and you
+                    want to show a message to premium users:
+                  </p>
+                  <pre><code class="language-PHP">
+&#60;div class="content">
+    &#60;p>Welcome to our premium content section.&#60;/p>
+    
+    @can('access premium content')
+        &#60;p>As a premium user, you have access to all premium articles.&#60;/p>
+    @else
+        &#60;p>You need to upgrade to a premium account to access this content.&#60;/p>
+    @endcan
+&#60;/div>
+
+            </code></pre>
+
+                  <p>
+                    In this example, users with the 'access premium content'
+                    permission will see the message about having access to
+                    premium articles, while other users will see a message
+                    encouraging them to upgrade to a premium account.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ++++++++++++++++++++++++++++Roles And permissions++++++++++++++++++++++++ -->
+          </div>
+        </div>
+      </div>
+
+      <!-- --------------------------Media Library------------------------------------- -->
+
+      <div class="tab-container">
+        <div class="tab">
+          <button class="tab-button" onclick="toggleTab('tab102')">
+            Laravel Media Library
+            <span class="tab-indicator">&#9658;</span>
+          </button>
+          <div class="tab-content" id="tab102">
+            <!-- ++++++++++++++++++++++++++++++Media Library+++++++++++++++++++++++++++++++++++ -->
+
+            <div class="tab-container">
+              <div class="tab">
+                <button class="tab-button" onclick="toggleTab('tab101')">
+                  Installation Configuration
+                  <span class="tab-indicator">&#9658;</span>
+                </button>
+                <div class="tab-content" id="tab101">
+                  <p>php artisan storage:link</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- +++++++++++++++++++++++++++Media Library+++++++++++++++++++++++++++++++++++++++++ -->
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="assets/prism.js"></script>
+    <script src="assets/script.js"></script>
+  </body>
+</html>

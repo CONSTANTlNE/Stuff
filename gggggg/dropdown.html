@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown Checkbox</title>
+    <style>
+      /* Styling for the dropdown container */
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      /* Styling for the checkbox container */
+      .checkbox-container {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+      }
+
+      /* Styling for the label and checkbox */
+      .checkbox-label {
+        display: block;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .checkbox-label input[type="checkbox"] {
+        margin-right: 8px;
+      }
+
+      /* Styling for the dropdown button */
+      .dropdown-button {
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      /* Style when the dropdown is open */
+      .show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dropdown">
+      <button class="dropdown-button">Select Options</button>
+      <div class="checkbox-container">
+        <label class="checkbox-label">
+          <input type="checkbox" name="option1" /> Option 1
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="option2" /> Option 2
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="option3" /> Option 3
+        </label>
+      </div>
+    </div>
+
+    <script>
+      // JavaScript to toggle the dropdown
+      const dropdownButton = document.querySelector(".dropdown-button");
+      const checkboxContainer = document.querySelector(".checkbox-container");
+
+      dropdownButton.addEventListener("click", function () {
+        checkboxContainer.classList.toggle("show");
+      });
+
+      // Close the dropdown if the user clicks outside of it
+      window.addEventListener("click", function (event) {
+        if (!event.target.matches(".dropdown-button")) {
+          if (checkboxContainer.classList.contains("show")) {
+            checkboxContainer.classList.remove("show");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

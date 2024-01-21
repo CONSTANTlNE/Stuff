@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+    <title>API Date Selection</title>
+  </head>
+  <body>
+    <label for="dateInput">Select Date: </label>
+    <input type="date" id="dateInput" value="2023-08-26" />
+    <button id="fetchData">Fetch Data</button>
+
+    <pre id="output"></pre>
+
+    <label for="dateInput2">Select Date: </label>
+    <input type="date" id="dateInput2" value="2023-08-11" />
+    <button id="fetchData2">Fetch Data</button>
+
+    <pre id="output2"></pre>
+
+    <div>
+      <p>Dynamic Currency</p>
+      <input type="date" id="date" />
+      <label for="">Currency</label>
+      <select name="" id="select">
+        <option selected>select</option>
+        <option>USD</option>
+        <option>GBP</option>
+        <option>EUR</option>
+      </select>
+      <p id="output3"></p>
+    </div>
+
+    <script>
+      // document.addEventListener("DOMContentLoaded", () => {
+      //   const dateInput = document.getElementById("dateInput");
+      //   const fetchDataButton = document.getElementById("fetchData");
+      //   const outputElement = document.getElementById("output");
+
+      //   fetchDataButton.addEventListener("click", () => {
+      //     const selectedDate = dateInput.value;
+      //     const apiUrl = `https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json/?date=${selectedDate}`;
+
+      //     fetch(apiUrl)
+      //       .then((response) => response.json())
+      //       .then((data) => {
+      //         // Display the fetched data or manipulate it as needed
+      //         outputElement.textContent = JSON.stringify(data, null, 2);
+      //         let currencies = JSON.stringify(data, null, 2);
+      //         console.log(currencies); // Move the console.log inside this block
+      //       })
+      //       .catch((error) => {
+      //         outputElement.textContent =
+      //           "An error occurred while fetching data.";
+      //         console.error(error);
+      //       });
+      //   });
+      // });
+
+      // document.addEventListener("DOMContentLoaded", () => {
+      //   const dateInput2 = document.getElementById("dateInput2");
+      //   const fetchDataButton2 = document.getElementById("fetchData2");
+      //   const outputElement2 = document.getElementById("output2");
+
+      //   fetchDataButton2.addEventListener("click", () => {
+      //     const selectedDate = dateInput.value;
+      //     const apiUrl = `https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json/?date=${selectedDate}`;
+
+      //     fetch(apiUrl)
+      //       .then((response) => response.json())
+      //       .then((data) => {
+      //         let usd = data[0]["currencies"].find(
+      //           (currency) => currency.code === "USD"
+      //         ).rateFormated;
+      //         console.log(usd);
+      //         outputElement2.textContent = usd;
+      //       })
+      //       .catch((error) => {
+      //         outputElement2.textContent =
+      //           "An error occurred while fetching data.";
+      //         console.error(error);
+      //       });
+      //   });
+      // });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const output = document.getElementById("output3");
+        const selectInput = document.getElementById("select");
+        const date = document.getElementById("date");
+
+        function fetchEX() {
+          const date2 = date.value;
+          const apiUrl = `https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json/?date=${date2}`;
+
+          fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(date2);
+              let usd = data[0]["currencies"].find(
+                (currency) => currency.code === selectInput.value
+              ).rateFormated;
+
+              output.textContent = usd;
+            })
+            .catch((error) => {
+              output.textContent = "An error occurred while fetching data.";
+              console.error(error);
+            });
+        }
+        selectInput.addEventListener("change", fetchEX);
+        date.addEventListener("change", fetchEX);
+      });
+    </script>
+  </body>
+</html>

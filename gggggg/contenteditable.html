@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+    <style>
+      .editable {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+      }
+
+      .inline-input {
+        display: inline;
+        min-width: 120px;
+        background: rgb(12, 12, 103);
+      }
+      .inline-input:not(:empty) {
+        background: #fc0;
+        color: #000;
+      }
+      .inline-input:empty:before {
+        content: attr(data-placeholder);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="editable" contenteditable="true">
+      <p>This content is editable. Try typing here!</p>
+    </div>
+
+    ===================================
+
+    <p>
+      I like pandas 🐼 because
+      <span
+        class="inline-input"
+        data-placeholder="Tap to write a story"
+        contenteditable
+      ></span>
+      and they are sooo cute!
+    </p>
+
+    <p>
+      Also, I think that
+      <span
+        class="inline-input"
+        data-placeholder="type another story here"
+        contenteditable
+      ></span
+      >!
+    </p>
+
+    <p>So, that's why! ❤️</p>
+  </body>
+</html>
