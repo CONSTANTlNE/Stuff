@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <div id="map2"></div>
+
+    <script>
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+
+        document.getElementById("map").innerHTML =
+          '<iframe width="700" height="300" src="https://maps.google.com/maps?q=' +
+          latitude +
+          "," +
+          longitude +
+          '&amp;z=15&amp;output=embed"></iframe>';
+      });
+    </script>
+  </body>
+</html>

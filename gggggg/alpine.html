@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alpine</title>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+      .active {
+        background-color: #4caf50; /* Green color when active */
+        color: white;
+      }
+      .input {
+        border: none;
+        outline: none;
+        background: none;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div x-data="{greeting:'Hello'}">
+      <span x-text="greeting +' '+ 'Constantine'"></span>
+    </div>
+
+    <div x-data="{visible:true}">
+      <p x-show="visible">somae hidden text</p>
+    </div>
+
+    <div x-data="{records:[1,2,3,4,5]}">
+      <p x-show="records.length >= 5">if records length is greater or equal</p>
+    </div>
+
+    <div x-data="{show:false}">
+      <button x-on:click="show=true">show</button>
+      <p x-on:click="show=false">hide</p>
+      <p x-show="show">somae hidden text</p>
+    </div>
+
+    <div x-data="{show:false}">
+      <button x-on:click="show=!show" :class="{ 'active': show }">
+        toggle
+      </button>
+      <p x-show="show">somae hidden text</p>
+    </div>
+
+    <br />
+    <input class="input" type="text" value="some value" />
+
+    <script>
+      const editable = document.querySelector(".input");
+      editable.addEventListener("input", () => {
+        console.log(editable.value);
+      });
+    </script>
+  </body>
+</html>
