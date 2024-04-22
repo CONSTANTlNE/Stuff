@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Image Conversion</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+  </head>
+  <body>
+    <!-- Existing form -->
+    <form
+      id="existingForm"
+      action="{{ route('conversion') }}"
+      method="POST"
+      enctype="multipart/form-data"
+    >
+      @csrf
+
+      <input type="hidden" id="convertedImage" name="converted_image" />
+      <!-- Submit button -->
+      <button type="submit">Submit Form with Image</button>
+    </form>
+
+    <label for="imageInput">Convert to webp</label>
+    <input type="file" id="imageInput" />
+    <button onclick="convertToWebP()">
+      Convert to WebP and Attach to Form
+    </button>
+
+    <pre><code>
+
+        $base64ImageData = $request->input('converted_image');
+
+        // Decode the base64 string to binary image data
+        $decodedImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64ImageData));//        dd($binaryImageData);
+
+
+        // Generate a unique filename for the stored image (you may customize this as needed)
+        $filename = 'converted_image_' . time() . '.webp';
+
+        // Store the image data using Laravel's storage system
+        Storage::disk('public')->put($filename, $decodedImageData);
+
+</code></pre>
+
+    <img src="assets/converted_image_1711381642.webp" />
+
+    <script>
+      function convertToWebP() {
+        const inputElement = document.getElementById("imageInput");
+
+        if (inputElement.files.length === 0) {
+          console.error("No file selected.");
+          return;
+        }
+
+        const file = inputElement.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+          const image = new Image();
+          image.onload = function () {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            // Set canvas dimensions
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            // Draw image on canvas
+            ctx.drawImage(image, 0, 0, image.width, image.height);
+
+            // Convert canvas to base64 string (WebP format)
+            const base64WebP = canvas.toDataURL("image/webp", 0.7);
+
+            // Set the base64 string as the value of the hidden input field
+            document.getElementById("convertedImage").value = base64WebP;
+
+            // Submit the form
+            document.getElementById("existingForm").submit();
+          };
+          image.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      }
+    </script>
+  </body>
+</html>

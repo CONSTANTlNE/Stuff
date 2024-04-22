@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <table id="myTable">
+      <thead>
+        <tr>
+          <th>Select</th>
+          <th>Item</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <input
+              type="checkbox"
+              class="checkbox-item"
+              name="item[]"
+              value="item1"
+            />
+          </td>
+          <td>Item 1</td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="checkbox"
+              class="checkbox-item"
+              name="item[]"
+              value="item2"
+            />
+          </td>
+          <td>Item 2</td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="checkbox"
+              class="checkbox-item"
+              name="item[]"
+              value="item3"
+            />
+          </td>
+          <td>Item 3</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <form id="myForm" action="/submit" method="post">
+      <!-- Selected items will be appended here -->
+    </form>
+
+    <button id="selectAllBtn">Select/Deselect All</button>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Select/Deselect All Button
+        document
+          .getElementById("selectAllBtn")
+          .addEventListener("click", function () {
+            var checkboxes = document.querySelectorAll(".checkbox-item");
+            checkboxes.forEach(function (checkbox) {
+              checkbox.checked = !checkbox.checked;
+            });
+          });
+
+        // Form Submission
+        document
+          .getElementById("myForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+            var selectedItems = document.querySelectorAll(
+              ".checkbox-item:checked"
+            );
+            selectedItems.forEach(function (item) {
+              var input = document.createElement("input");
+              input.setAttribute("type", "hidden");
+              input.setAttribute("name", item.name);
+              input.setAttribute("value", item.value);
+              document.getElementById("myForm").appendChild(input);
+            });
+            this.submit(); // Submit the form
+          });
+      });
+    </script>
+  </body>
+</html>

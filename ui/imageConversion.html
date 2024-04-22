@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Conversion</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+  </head>
+  <body>
+    <label for="imageInput">Convert to webp</label>
+    <input type="file" id="imageInput" />
+    <button onclick="convertToWebP()">Convert to WebP</button>
+
+    <script>
+      function convertToWebP() {
+        const inputElement = document.getElementById("imageInput");
+
+        if (inputElement.files.length > 0) {
+          const file = inputElement.files[0];
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const image = new Image();
+            image.onload = function () {
+              const canvas = document.createElement("canvas");
+              canvas.width = image.width;
+              canvas.height = image.height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(image, 0, 0);
+
+              // Compress the image to 0.7 quality (adjust as needed)
+              const compressedWebpData = canvas.toDataURL("image/webp", 0.7);
+
+              console.log(compressedWebpData);
+              // Download or display the compressed WebP image
+              // For example, you can create a download link
+              const downloadLink = document.createElement("a");
+              downloadLink.href = compressedWebpData;
+              downloadLink.download = "compressed_image.webp";
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+            };
+            image.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    </script>
+  </body>
+</html>

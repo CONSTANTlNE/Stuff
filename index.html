@@ -459,6 +459,15 @@ class UserController {
                   <span class="tab-indicator">&#9658;</span>
                 </button>
                 <div class="tab-content" id="tab2">
+
+              <div class="tab-container">
+              <div class="tab">
+              <button class="tab-button" onclick="toggleTab('Validation')">
+              Validation<span class="tab-indicator">&#9658;</span>
+              </button>
+              <div class="tab-content" id="Validation">
+
+                         
                   <p>create a request class</p>
                   <pre><code class="language-PHP">
 php artisan make:request PermissionRequest
@@ -505,13 +514,52 @@ php artisan make:request PermissionRequest
         return redirect()->route('permissions')->with('message', 'Permission created successfully.');
     }
                   </code></pre>
-                  <p>display errors in view in form</p>
-                  <pre><code class="language-PHP">
-&lt;input id="t-text" type="text" name="name"  class="form-control w-25 @error('name') is-invalid @enderror" required="">
-@error('name')
-&lt;div class="alert alert-danger">{{ $message }}&lt;/div>
-@enderror
-                  </code></pre>
+    <p>display errors in view in form</p>
+    <pre><code class="language-PHP">
+    &lt;input id="t-text" type="text" name="name"  class="form-control w-25 @error('name') is-invalid @enderror" required="">
+    @error('name')
+    &lt;div class="alert alert-danger">{{ $message }}&lt;/div>
+    @enderror
+    </code></pre>
+
+            <p>Bulk Validation in Controller </p>
+        <pre><code class="language-PHP">
+          public function submitForm(Request $request)
+{
+  $messages = [
+      'email.required' => 'We need Email',
+      'email.email' => 'Need Valid Email',
+      'name.required' => 'We need Name',
+      'name.max' => 'Name is too long',
+  ];
+  $validator = Validator::make($request->all(), [
+      'name' => 'required|string|max:20',
+      'email' => 'required|email|max:50',
+
+  ], $messages);
+  
+  if ($validator->fails()) {
+      return response()->json(['errors' => $validator->errors()], 422);
+  }
+
+  return response()->json(['success' => 'Form submitted successfully!']);
+}
+        </code>
+        </pre>
+
+              &lt;
+
+             <pre><code class="language-PHP">
+
+              </code>
+              </pre>
+
+              &lt;
+              </div>
+              </div>
+              </div>
+
+         
                 </div>
               </div>
             </div>
@@ -532,9 +580,47 @@ php artisan make:request PermissionRequest
                 </button>
                 <div class="tab-content" id="tab103">
                   <p>In App folder , create a new folder name Helpers , inside create a helper1.php (not class)</p>
+                
+<p>in Helper.PHP write any function we need</p>
+<pre><code class="language-PHP">
+use Illuminate\Support\Facades\Log;
+
+function logExecutionTime($name, $start, $end) {
+  $executionTime = ($end - $start) / 1e+6; // Convert nanoseconds to milliseconds
+  Log::channel('execution_time')->info("{$name} - Execution time: {$executionTime} milliseconds");
+}
+</code></pre>
+
+<p>add Helper.PHP To composer.json autoload </p>
+<pre><code class="language-PHP">
+        "files": [
+            "app/Helpers/helper.php"
+        ]
+In Terminal : composer dump-autoload
+
+</code></pre>
+
+  <p>After Use in Any Controller </p>
+        <pre><code class="language-PHP">
+$start = hrtime(true);
+
+code here 
+
+$end = hrtime(true);
+logExecutionTime('creaate new product', $start, $end);
+
+</code></pre>
+
+
+
+
                 </div>
               </div>
             </div>
+
+
+
+
 
           <div class="tab-container">
               <div class="tab">
@@ -684,22 +770,25 @@ Fortify<span class="tab-indicator">&#9658;</span>
             <pre><code class="language-PHP">
                   public function register(): void
     {
-        Fortify::registerView(function(){
+        Fortify::loginView(function () {
+            return view('auth.login');
+        });
+
+        Fortify::registerView(function () {
             return view('auth.register');
         });
 
-        Fortify::loginView(function (){
-            return view('auth.login');
-        });
-        Fortify::requestPasswordResetLinkView(function (){
-            return view('auth.password.request');
+        //View with email input to send password reset link
+        Fortify::requestPasswordResetLinkView(function () {
+            return view('auth.forgot-password');
         });
 
-        Fortify::resetPasswordView(function (){
-            return view('auth.password.edit');
+        //View with two email inputs for new password
+        Fortify::resetPasswordView(function ($request) {
+            return view('auth.reset-password', ['request' => $request]);
         });
 
-        Fortify::verifyEmailView(function (){
+        Fortify::verifyEmailView(function () {
             return view('auth.verify-email');
         });
 
@@ -1008,6 +1097,62 @@ JS
     @endforeach
 &lt;/select>
 </code></pre>
+
+
+<p>Send Multiple HTTP Requests</p>
+<p>retrieves data from multiple endpoints using Laravel's HTTP client pooling feature, which can be particularly useful when you need to fetch data from multiple sources without waiting for each request to finish sequentially.
+</p>
+<pre><code class="language-PHP">
+$responses = Http::pool(fn($client) => [
+  $client->get('https://api.novaposhta.ua/v2.0/json/Address/getWarehouses'),
+  $client->get('https://api.novaposhta.ua/v2.0/json/Address/getWarehouses'),
+  $client->get('https://api.novaposhta.ua/v2.0/json/Address/getWarehouses'),
+]);
+
+return $responses[0]->ok && $responses[1]->ok && $responses[2]->ok;
+
+Putting it all together, the line of code checks if all three HTTP requests were successful
+by verifying that the ok property of each response object is true. If all three requests
+were successful, the expression will evaluate to true; otherwise, it will evaluate to false.
+</code>
+</pre>
+
+
+<p>Retrive Data in Descending order</p>
+<pre><code class="language-PHP">
+$sectors     = Sector::with([
+    'prices' => function ($query) {
+        $query->orderBy('created_at', 'desc');
+    }
+])->get();
+</code>
+</pre>
+
+
+<p>Display in View Last Record retrieved by Desc order</p>
+<pre><code class="language-PHP">
+{{$sector->prices->first()->price}}
+</code>
+</pre>
+
+
+
+<p>Create Log Entries in Controller</p>
+<pre><code class="language-PHP">
+$log = new Logger('name');
+$log->pushHandler(new StreamHandler(storage_path('logs/tbc.log'), Logger::INFO));
+$log->info('Called.');
+create tbc.log file in storage->logs folder
+</code>
+</pre>
+
+
+<p></p>
+<pre><code class="language-PHP">
+
+</code>
+</pre>
+
 
 
 </div>
@@ -1369,8 +1514,7 @@ SOCIALITE<span class="tab-indicator">&#9658;</span>
 3. Basic Settings -> Site URL -> https://localhost:8000/
 </code>
 </pre>
-
-<div></div>
+<div><img width="800px" src="assets/fb.png"></div>
 
 <p>in Config/Service.php</p>
 <pre><code class="language-PHP">
@@ -1939,10 +2083,141 @@ MAIL<span class="tab-indicator">&#9658;</span>
 <div class="tab-content" id="email">
 
 
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('userregistermail')">
+Get Email when New User is Registered<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="userregistermail">
+
+
+<p>Create New Mail</p>
+<pre><code class="language-PHP">
+php artisan make:mail NewUserRegisteredEmail
+</code>
+</pre>
+
+
+<p>In NewUserRegisteredEmail.php In "store" method</p>
+<pre><code class="language-PHP">
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
+    ==CREATE MAIL VIEW in VEW FOLDER==
+        public function content(): Content
+    {
+        return new Content(
+            view: 'mail.newUser',
+        );
+    }
+</code>
+</pre>
+
+<p>CHANGE FORTIFY</p>
+<pre><code class="language-PHP">
+Create CustomRegisteredUserController  and copy-paste logic from fortifys 
+Controller
+
+Add this code :
+
+Mail::to('webmenu01@gmail.com')->send(new NewUserRegisteredEmail($user));
+</code>
+</pre>
+
+
+</div>
+</div>
+</div>
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('customemailnotification')">
+Customizing Laravel Notifications<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="customemailnotification">
+
+<p>Create Custom Notification</p>
+<pre><code class="language-PHP">
+php artisan make:notification CustomResetPassword
+
+Copy and paste all from ...   and change namespace to App\Notifications;
+
+vendor/laravel/framework/src/Illuminate/Auth/Notifications/ResetPassword.php
+
+
+Copy from ... to USER  model:
+
+vendor/laravel/framework/src/Illuminate/Auth/Passwords/CanResetPassword.php
+
+
+    public function sendPasswordResetNotification($token)
+    {
+                 Cangee to new CustomResetPassword!!
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+
+
+</code>
+</pre>
+
+
+<p>In CustomResetPassword:</p>
+<pre><code class="language-PHP">
+Create Mail Veiw  : view('mail.reset_password', $data)
+
+  change :
+
+      protected function buildMailMessage($url)
+    {
+
+        $expire_minutes = config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
+
+        $data = [
+            'url' => $url,
+            'expire' => $expire_minutes
+        ];
+
+        return (new MailMessage)->view('mail.reset_password', $data)
+            ->from('webmenu01@gmail.com', 'Web Menu')
+            ->subject(Lang::get('Reset Password Notification'));
+    }
+</code>
+</pre>
+
+
+
+
+
+</div>
+</div>
+</div>
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('createmail')">
+Create Custom Email<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="createmail">
+
+
+
+<p>In CustomResetPassword:</p>
 <pre><code class="language-PHP">
 
 </code>
 </pre>
+
+
+
+
+
+</div>
+</div>
+</div>
 
 
 
@@ -2136,6 +2411,247 @@ VITE<span class="tab-indicator">&#9658;</span>
 
 
 
+       <!-- ========================GOOGLE============================== -->
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('google')">
+GOOGLE<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="google">
+
+
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('gmail')">
+GMAIL SETUP<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="gmail">
+
+
+
+<p>In .ENV</p>
+<pre><code class="language-PHP">
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=gmta.constantine@gmail.com
+MAIL_PASSWORD='ntaymobfmvigufrx'
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="gmta.constantine@gmail.com"
+MAIL_FROM_NAME="${APP_NAME}"
+</code>
+</pre>
+
+&lt;
+
+</div>
+</div>
+</div>
+
+
+
+<pre><code class="language-PHP">
+
+</code>
+</pre>
+
+&lt;
+
+</div>
+</div>
+</div>
+
+
+       <!-- ========================FACEBOOK============================== -->
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('facebook')">
+FACEBOOK<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="facebook">
+
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('facebookchat')">
+Chat<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="facebookchat">
+
+
+<pre><code class="language-PHP">
+
+</code>
+</pre>
+
+&lt;
+
+</div>
+</div>
+</div>
+
+
+{
+  "access_token": "eyJhbGciOiJKSeriiIsImtpZCI6IjVFMjBGMzQ2RUY1RjU2ODkxQTIyRkUzQUVCRjAzMzlGMzVDNjk1QjYiLCJ0eXAiOiJKV1QiLCJ4NXQiOiJYaUR6UnU5ZlZva2FJdjQ2Nl9Bem56WEdsYlkifQ.eyJuYmYiOjE2MzE2NDQyNjEsImV4cCI6MTYzMTczMDY2MSwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50c2FwaS50YmNiYW5rLmdlLyIsImF1ZCI6WyJodHRwczovL2FjY291bnRzYXBpLnRiY2JhbmsuZ2UvcmVzb3VyY2VzIiwicGF5bWVudGFwaSJdLCJjbGllbnRfaWQiOiI3MDAwMDAyIiwic2NvcGUiOlsicGF5bWVudGFwaSJdfQ.GNIaxgik-ElXrvXOky5_1D1YjEEX5CB3eQHKPwvdCNhB-HvblqZ78QSNJcl6qLfL8gRTd0x9ASCgXu2z2RQYJ-wls0V2IwrQ7p4WEU-ON9QnasOjZWgPeVAtZQC_zjH9DdmL1GiDTIHLErhKDGl3YtSGcvPKSvTpABWda6HvF7lNGlEK0SZxzzt1i1SkpAnQfzIO1ATEmKdM1EmWzp5ZaDk0cF-Wzfk_2CrQAGofc80GT64U8WOXvVOx1gVYmjzqYs71XCOqfQdySYBIc-tbUC6YIoeSPZfu1hpi33Gz40ig57t4jxeE7Jh--38ydO4AGEw8BdlLv534O0V3ZoOddg",
+  "expires_in": 86400,
+  "token_type": "Bearer"
+}
+
+</div>
+</div>
+</div>
+
+       <!-- ========================QUEUE============================== -->
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('Queue')">
+Jobs and Queues<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="Queue">
+
+
+
+       <!-- ========================Email Queue============================== -->
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('emailqueue')">
+Email Queue<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="emailqueue">
+<p>Use Database Driver</p>
+<pre><code class="language-PHP">
+php artisan queue:table
+ 
+php artisan migrate
+
+In .env : 
+
+QUEUE_CONNECTION=database
+
+</code>
+</pre>
+
+
+
+<p>In created Mail Class add 'implements ShouldQueue'</p>
+<pre><code class="language-PHP">
+class SendEmail extends Mailable implements ShouldQueue
+
+MAIL facade DOES NOT NEED a Separate Job
+
+
+IF QUEUE NOT WORKING AND JOBS ARE NOT IN JOBS TABLE ,  php artisan config:clear
+
+Dispatch Worker
+
+php artisan queue:work
+</code>
+</pre>
+
+&lt;
+
+
+</div>
+</div>
+</div>
+
+       <!-- ========================Job For Specific Task============================== -->
+
+<div class="tab-container">
+<div class="tab">
+<button class="tab-button" onclick="toggleTab('JobForCode')">
+Jobs for specific Code<span class="tab-indicator">&#9658;</span>
+</button>
+<div class="tab-content" id="JobForCode">
+
+<p>Create A Job</p>
+<pre><code class="language-PHP">
+php artisan make:job ProcessSpecificCode
+
+it creates a Jobs folder and a jobcontroller in APP 
+
+in jobController 
+
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class ProcessQueueJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $data;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    public function handle()
+    {
+        $queueJob = new QueueJob();
+        $queueJob->queuedjob = $this->data['message'];
+        $queueJob->save();
+    }
+}
+</code>
+</pre>
+
+
+
+
+<p>USE job in Controller method</p>
+<pre><code class="language-PHP">
+
+      public function send(Request $request){
+
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'message' => $request->message
+        ];
+
+        Mail::to($data['email'])->queue(new TestMail($data));
+
+        //  MOVE THIS CODE TO JOB FILE FOR EXECUTION IN QUEUE
+//          $data=new QueueJob();
+//          $data->queuedjob=$data['message'];
+//          $data->save();
+
+
+        ProcessQueueJob::dispatch($data);
+
+
+        return back();
+
+    }
+
+</code>
+</pre>
+
+
+&lt;
+
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+</div>
+
+
        <!-- ========================blank============================== -->
 
 <div class="tab-container">
@@ -2150,6 +2666,7 @@ blank<span class="tab-indicator">&#9658;</span>
 
 </code>
 </pre>
+
 
 &lt;
 
